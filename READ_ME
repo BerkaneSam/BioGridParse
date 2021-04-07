@@ -1,0 +1,40 @@
+Pour lancer le programme de base aller dans le bash/invité de commande et noter:
+
+python data -c unicode unicode
+
+python: chemin python
+
+data: base de donnee(en .txt) (obligatoire)
+
+unicode: code Uniprot de la protéine
+
+option:
+-h : aide
+
+-c : codes uniprot (obligatoire, au moins deux)
+
+-e : filtrer par experience (optionnel)
+experience disponible:
+        AP-MS: Affinity Capture-MS,
+        Two-hybrid: Two-hybrid,
+        RC: Reconstituted Complex,
+        ACW: Affinity Capture-Western,
+        ACL: Affinity Capture-Luminescence,
+        BA: Biochemical Activity,
+        CCS: Co-crystal Structure,
+        FW: Far Western,
+        FRET: FRET,
+        Protein-peptide: Protein-peptide,
+        Co-localization: Co-localization,
+        AC-RNA: Affinity Capture-RNA,
+        Protein-RNA: Protein-RNA,
+        PCA: PCA,
+        Co-purification: Co-purification,
+        Co-fractionation: Co-fractionation,
+        PL-MS: Proximity Label-MS.
+
+-t : filtrer par throughput (optionnel)
+throughput disponible:
+        Low-Throughput: Low Throughput,
+        High-Throughput: High Throughput,
+        High-Throughput|Low-Throughput: High Throughput|Low Throughput.
