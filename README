@@ -1,6 +1,8 @@
 Pour lancer le programme de base aller dans le bash/invité de commande et noter:
 
-python data -c unicode unicode
+python prog data -c unicode unicode
+
+prog : programe a faire tourner
 
 python: chemin python
 

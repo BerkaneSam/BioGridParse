@@ -5,12 +5,25 @@ Portion servant à gerer les arguments du programme
 '''
 parser = argparse.ArgumentParser(description='Process BioGrid databases.')
 parser.add_argument('data', metavar='data', type=str, help="The BIOGGRID database to be used.")
-parser.add_argument('-c', '--codes', nargs=2, help="The different Uniprot codes to be used", required=True)
+parser.add_argument('-c', '--codes', nargs='*', help="The different Uniprot codes to be used", required=True)
 parser.add_argument('-e', '--experience', help="Choose a type of experience to filter with (ex: Two-hybrid, AP-Ms...)")
 parser.add_argument('-t', '--throughput',
                     help="Choose a type of throughput to filter with (Low-Throughput,"
                          "High-Throughput, High-Throughput|Low-Throughput)")
 args = parser.parse_args()
+
+
+def uni_listing(argument):
+    """
+    Fonction renvoyant les code uniprot pris en argument sous forme de liste
+    :param argument: code uniprot(-c)
+    :return: liste de code uniprot
+    """
+    unicodes = []
+    for i in argument:
+        if i not in unicodes:
+            unicodes.append(i)
+    return unicodes
 
 
 def switch_exp(argument):
@@ -70,42 +83,51 @@ def parsing(file):
     return parsedfile
 
 
-def research(data):
-    """
-    Fonction permettant de recuperer les experiences/lignes de la base de donnee ou les proteines ont des interactions
-    en utilisant les codes Uniprot donnees en arguments et en les comparant a la base de donnee.
-    Permet aussi de filtrer par rapport aux types d'experience utilise pour mettre en evidence ces interactions.
-    :param data: base de donnee sous la forme d'une liste obtenu grace a parsing().
-    :return: une liste contenant les numero de ligne de la base de donnee ou les conditions sont rempli
-    """
-    dataline = []
-    for i in range(len(data)):
-        if (data[i][23] != args.codes[0] or data[i][26] != args.codes[1]) and (
-                data[i][23] != args.codes[1] or data[i][26] != args.codes[0]):
-            continue
-        if switch_exp(args.experience) != "Invalid experiment":
-            if data[i][11] == switch_exp(args.experience):
-                dataline.append(i + 1)
-        else:
-            dataline.append(i + 1)
-    return dataline
-
-
-def research_through(vector, data):
+def research_through(vector, data, printvec):
     """
     Une fonction permettant de tester sous quelle throughput l'experience a ete faite si mis en argument
     :param vector: liste contenant les resultat preliminaire obtenu a l'aide de research()
     :param data: la base de donnee sous forme de liste obtenu a l'aide de parsing()
-    :return: une liste contenant les numero de ligne de la base de donnee ou les conditions sont rempli
+    :param printvec: vecteur des informations a imprimer
+    :return: une liste contenant informations a imprimer
     """
-    dataline = []
+    printing = []
+    r = -1
     if switch_throu(args.throughput) != "No filter":
         for i in vector:
+            r += 1
             if data[i - 1][17] == switch_throu(args.throughput):
-                dataline.append(i)
-        return dataline
+                printing.append(printvec[r])
+        return printing
     else:
-        return vector
+        return printvec
+
+
+def research(data, codes):
+    """
+    Fonction permettant de recuperer les experiences/lignes de la base de donnee ou les proteines ont des interactions
+    en utilisant les codes Uniprot donnees en arguments et en les comparant a la base de donnee.
+    Permet aussi de filtrer par rapport aux types d'experience utilise pour mettre en evidence ces interactions.
+    Recupere aussi les informations a imprimer par la suite
+    :param data: base de donnee sous la forme d'une liste obtenu grace a parsing().
+    :param codes: liste de code uniprot
+    :return: une liste contenant les informations a imprimer renvoyer par research_through()
+    """
+    dataline = []
+    printing = []
+    for i in range(len(data)):
+        if data[i][23] in codes and data[i][26] in codes:
+            if switch_exp(args.experience) != "Invalid experiment":
+                if data[i][11] == switch_exp(args.experience):
+                    dataline.append(i + 1)
+                    printing.append(
+                        f"line : {i + 1}, uniprot codes: {data[i][23]} {data[i][26]}, pubmed: {data[i][14]}, "
+                        f"experiment: {data[i][11]}, throughput: {data[i][17]}")
+            else:
+                dataline.append(i + 1)
+                printing.append(f"line : {i + 1}, uniprot codes: {data[i][23]} {data[i][26]}, pubmed: {data[i][14]}, "
+                                f"experiment: {data[i][11]}, throughput: {data[i][17]}")
+    return research_through(dataline, data, printing)
 
 
 def biogrind():
@@ -114,12 +136,13 @@ def biogrind():
     :return: impression des resultat
     """
     integretaddata = parsing(args.data)
-    preliminary = research(integretaddata)
-    occurences = research_through(preliminary, integretaddata)
+    unicodes = uni_listing(args.codes)
+    occurences = research(integretaddata, unicodes)
     if not occurences:
         print("Pas d'experience rassemblant ces protéines (possiblement liées aux conditions)")
     else:
-        print(f"Lignes ou l'on retrouve ces deux codes Uniprot : {occurences}")
+        for i in occurences:
+            print(i)
 
 
 biogrind()
