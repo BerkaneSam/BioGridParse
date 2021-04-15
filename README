@@ -2,7 +2,7 @@ Pour lancer le programme de base aller dans le bash/invité de commande et noter
 
 python prog data -c unicode unicode
 
-prog : programe a faire tourner
+prog : programme a faire tourner
 
 python: chemin python
 
@@ -13,12 +13,15 @@ unicode: code Uniprot de la protéine
 option:
 -h : aide
 
--c : codes uniprot (obligatoire, au moins deux)
+-c : codes uniprot (obligatoire)
 
--e : filtrer par experience (optionnel)
+-d : permet de mettre un document .txt en argument -c, argument contenant les
+codes Uniprot a etudie separe par des virgules
+
+-e : filtrer par experience (optionnel, plusieurs experiences peuvent etre donnee)
 experience disponible:
         AP-MS: Affinity Capture-MS,
-        Two-hybrid: Two-hybrid,
+        T-H: Two-hybrid,
         RC: Reconstituted Complex,
         ACW: Affinity Capture-Western,
         ACL: Affinity Capture-Luminescence,
@@ -26,17 +29,17 @@ experience disponible:
         CCS: Co-crystal Structure,
         FW: Far Western,
         FRET: FRET,
-        Protein-peptide: Protein-peptide,
-        Co-localization: Co-localization,
+        PP: Protein-peptide,
+        Co-l: Co-localization,
         AC-RNA: Affinity Capture-RNA,
-        Protein-RNA: Protein-RNA,
+        P-RNA: Protein-RNA,
         PCA: PCA,
-        Co-purification: Co-purification,
-        Co-fractionation: Co-fractionation,
+        Co-p: Co-purification,
+        Co-f: Co-fractionation,
         PL-MS: Proximity Label-MS.
 
--t : filtrer par throughput (optionnel)
+-t : filtrer par throughput (optionnel, plusieurs experience peuvent etre donnee)
 throughput disponible:
-        Low-Throughput: Low Throughput,
-        High-Throughput: High Throughput,
-        High-Throughput|Low-Throughput: High Throughput|Low Throughput.
+        LT: Low Throughput,
+        HT: High Throughput,
+        HLT: High Throughput|Low Throughput.
