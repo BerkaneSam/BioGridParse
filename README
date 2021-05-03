@@ -8,7 +8,9 @@ python: chemin python
 
 data: base de donnee(en .txt) (obligatoire)
 
-unicode: code Uniprot de la protéine
+unicode: code Uniprot de la protéine (ou un document .txt contenant les codes aux bon format)
+
+Une recherche par defaut (non utilisation de -i) sera effectué sur une base de donnee de type BioGrid
 
 option:
 -h : aide
@@ -16,7 +18,7 @@ option:
 -c : codes uniprot (obligatoire)
 
 -d : permet de mettre un document .txt en argument -c, argument contenant les
-codes Uniprot a etudie separe par des virgules
+codes Uniprot a etudie separe par des virgules(sans espaces)
 
 -e : filtrer par experience (optionnel, plusieurs experiences peuvent etre donnee)
 experience disponible:
@@ -43,3 +45,62 @@ throughput disponible:
         LT: Low Throughput,
         HT: High Throughput,
         HLT: High Throughput|Low Throughput.
+
+-i : permet d'effectuer une recherche sur une base de donnee IntAct (les filtres sont pour le moment
+indisponible sur IntAct)
+
+-a : permet d'effectuer une recherche sur une base de données BioGrid et IntAct simultanément (mettre la base
+de données BioGrid en première puis la IntAct en arguments)
+Pour lancer le programme de base aller dans le bash/invité de commande et noter:
+
+python prog data -c unicode unicode
+
+prog : programme a faire tourner
+
+python: chemin python
+
+data: base de donnee(en .txt) (obligatoire)
+
+unicode: code Uniprot de la protéine (ou un document .txt contenant les codes aux bon format)
+
+Une recherche par defaut (non utilisation de -i) sera effectué sur une base de donnee de type BioGrid
+
+option:
+-h : aide
+
+-c : codes uniprot (obligatoire)
+
+-d : permet de mettre un document .txt en argument -c, argument contenant les
+codes Uniprot a etudie separe par des virgules(sans espaces)
+
+-e : filtrer par experience (optionnel, plusieurs experiences peuvent etre donnee)
+experience disponible:
+        AP-MS: Affinity Capture-MS,
+        T-H: Two-hybrid,
+        RC: Reconstituted Complex,
+        ACW: Affinity Capture-Western,
+        ACL: Affinity Capture-Luminescence,
+        BA: Biochemical Activity,
+        CCS: Co-crystal Structure,
+        FW: Far Western,
+        FRET: FRET,
+        PP: Protein-peptide,
+        Co-l: Co-localization,
+        AC-RNA: Affinity Capture-RNA,
+        P-RNA: Protein-RNA,
+        PCA: PCA,
+        Co-p: Co-purification,
+        Co-f: Co-fractionation,
+        PL-MS: Proximity Label-MS.
+
+-t : filtrer par throughput (optionnel, plusieurs experience peuvent etre donnee)
+throughput disponible:
+        LT: Low Throughput,
+        HT: High Throughput,
+        HLT: High Throughput|Low Throughput.
+
+-i : permet d'effectuer une recherche sur une base de donnee IntAct (les filtres sont pour le moment
+indisponible sur IntAct)
+
+-a : permet d'effectuer une recherche sur une base de données BioGrid et IntAct simultanément (mettre la base
+de données BioGrid en première puis la IntAct en arguments)
