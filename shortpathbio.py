@@ -32,6 +32,7 @@ def parse_edges(edges):
             pre_edges.extend([spl[1], spl[3]])
             if pre_edges[0] != pre_edges[1]:
                 parsed_edges.append(pre_edges)
+    edges_depository = list(dict.fromkeys(edges_depository))
     return parsed_edges, edges_depository
 
 
@@ -56,34 +57,55 @@ def shortest_path(inter, main, target, track, marked):
     print("BFS ongoing...")
     queue = [main]
     marked[main] = True
+    dist = {main: 0}
+    tmp = None
     while len(queue) != 0:
         x = queue[0]
         queue.pop(0)
         for edge in inter:
             if x in edge:
                 for node in edge:
-                    if node != x and marked[node] is not True:
+                    if marked[node] is not True:
+                        dist[node] = dist[x] + 1
                         queue.append(node)
-                        track[node] = x
-                        marked[x] = True
+                        marked[node] = True
                         if node == target:
-                            return True
+                            tmp = dist[node]
+                    if node != x:
+                        if tmp is not None and dist[node] > tmp:
+                            return True, tmp
+                        if dist[x] < dist[node]:
+                            if node in track.keys() and x not in track[node]:
+                                track[node].append(x)
+                            else:
+                                track[node] = [x]
     return False
+
+
+def pathfinding(path, main, target, limit):
+    mpath = []
+    if main == target:
+        return [[main]]
+    for node in path[target]:
+        cur_node = pathfinding(path, main, node, limit - 1)
+        for lnodes in cur_node:
+            if len(lnodes)+1 < limit:
+                lnodes.append(target)
+                mpath.append(lnodes)
+    return mpath
 
 
 def find_path(inter, main, target, marked):
     print("launch of shortest path...")
     tracker = {}
     link = []
-    if not shortest_path(inter, main, target, tracker, marked):
+    result, dist = shortest_path(inter, main, target, tracker, marked)
+    print(dist)
+    if not result:
         print("The two proteins aren't linked")
     else:
-        link.append(target)
-        pathing = target
-        while tracker[pathing] != main:
-            link.append(tracker[pathing])
-            pathing = tracker[pathing]
-        link.append(main)
+        link = pathfinding(tracker, main, target, dist + 2)
+        print(link)
     return link
 
 
@@ -125,8 +147,8 @@ def edge_json_making(path, edges, neighbors=None, output="sp_edges.txt"):
             if (listed_edge[1] == path[i] and listed_edge[3] == path[i - 1]) or (
                     listed_edge[3] == path[i] and listed_edge[1] == path[i - 1]):
                 to_be_wrote.append(j)
-    print(" handling neighbors...")
     if neighbors is not None:
+        print(" handling neighbors...")
         for k in edges:
             listed_edge = k.split("'")
             if listed_edge[1] in neighbors.keys():
@@ -153,20 +175,40 @@ def shortpath_main():
     shorter_path = find_path(edges, args.codes[0], args.codes[1], nodes)
     # print(shorter_path)
     if args.neighbors:
-        neighbors, true_nodes = neighbor_finder(shorter_path, edges)
-        if args.output:
-            edge_json_making(shorter_path, edges_intel, neighbors, args.output[1])
-            node_json_making(true_nodes, args.output[0])
+        if len(shorter_path) == 1:
+            neighbors, true_nodes = neighbor_finder(shorter_path, edges)
+            if args.output:
+                edge_json_making(shorter_path, edges_intel, neighbors, args.output[1])
+                node_json_making(true_nodes, args.output[0])
+            else:
+                edge_json_making(shorter_path, edges_intel, neighbors)
+                node_json_making(true_nodes)
         else:
-            edge_json_making(shorter_path, edges_intel, neighbors)
-            node_json_making(true_nodes)
+            for path in shorter_path:
+                neighbors, true_nodes = neighbor_finder(path, edges)
+                if args.output:
+                    edge_json_making(path, edges_intel, neighbors, f"{args.output[1]}_{shorter_path.index(path)}.txt")
+                    node_json_making(true_nodes, f"{args.output[0]}_{shorter_path.index(path)}")
+                else:
+                    edge_json_making(path, edges_intel, neighbors, f"sp_edges_{shorter_path.index(path)}.txt")
+                    node_json_making(true_nodes, f"sp_nodes_{shorter_path.index(path)}.txt")
     else:
-        if args.output:
-            edge_json_making(shorter_path, edges_intel, args.output[1])
-            node_json_making(shorter_path, args.output[0])
+        if len(shorter_path) == 1:
+            if args.output:
+                edge_json_making(shorter_path, edges_intel, args.output[1])
+                node_json_making(shorter_path, args.output[0])
+            else:
+                edge_json_making(shorter_path, edges_intel)
+                node_json_making(shorter_path)
         else:
-            edge_json_making(shorter_path, edges_intel)
-            node_json_making(shorter_path)
+            for path in shorter_path:
+                if args.output:
+                    edge_json_making(path, edges_intel, None, f"{args.output[1]}_{shorter_path.index(path)}.txt")
+                    node_json_making(path, f"{args.output[0]}_{shorter_path.index(path)}")
+                else:
+                    edge_json_making(path, edges_intel, None, f"sp_edges_{shorter_path.index(path)}.txt")
+                    node_json_making(path, f"sp_nodes_{shorter_path.index(path)}.txt")
+
     print("program done")
 
 
