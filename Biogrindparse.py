@@ -480,4 +480,3 @@ def biogrind():
 Lancement du programme
 '''
 biogrind()
-

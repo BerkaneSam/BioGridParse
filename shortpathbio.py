@@ -195,7 +195,7 @@ def shortpath_main():
     else:
         if len(shorter_path) == 1:
             if args.output:
-                edge_json_making(shorter_path, edges_intel, args.output[1])
+                edge_json_making(shorter_path, edges_intel, None, args.output[1])
                 node_json_making(shorter_path, args.output[0])
             else:
                 edge_json_making(shorter_path, edges_intel)
