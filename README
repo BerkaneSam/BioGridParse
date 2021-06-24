@@ -1,12 +1,12 @@
-Pour lancer le programme de base aller dans le bash/invité de commande et noter:
+    Pour lancer le programme de base (Biogrindparse.py) aller dans le bash/invité de commande et noter:
 
-python prog data -c unicode unicode
+python3 Biogrindparse.py data -c unicode unicode
 
 prog : programme a faire tourner
 
 python: chemin python
 
-data: base de donnee(en .txt) (obligatoire)
+data: base de donnee(en .txt) (obligatoire) plusieurs peuvent être donner (BioGrid suivi par IntAct)
 
 unicode: code Uniprot de la protéine (ou un document .txt contenant les codes aux bon format)
 
@@ -104,3 +104,41 @@ indisponible sur IntAct)
 
 -a : permet d'effectuer une recherche sur une base de données BioGrid et IntAct simultanément (mettre la base
 de données BioGrid en première puis la IntAct en arguments)
+
+    Pour lancer shortpathbio.py aller dans le bash/invité de commande et noter:
+
+python3 shortpathbio.py nodes edges -c unicode unicode
+
+nodes: fichier JSON avec les nodes
+
+edges: fichier JSON avec les edges
+
+unicode: code proteique source et cible (obligatoirement deux)
+
+option:
+
+-n : si activer permet de retrouver toutes les interactions des proteines presentes dans le(s) plus court chemin(s)
+
+-o : permet de nommer les fichier de sortie (nodes puis edges)
+
+    Pour lancer biointstat.py aller dans le bash/invité de commande et noter:
+
+python3 biointstat.py edges -s valeur
+
+edges: fichier JSON des edges
+
+valeur: valeur de separation des intervalles
+
+    Pour lancer parsebio.py aller dans le bash/invité de commande et noter:
+
+python3 parsebio.py data
+
+data: base de donnee BioGrid
+
+    Pour lancer parseint.py aller dans le bash/invité de commande et noter:
+
+python3 parseint.py data biodata
+
+data: base de donnee IntAct
+
+biodata: fichier de code proteique present dans BioGrid au format txt recuperer a l'aide de parsebio.py

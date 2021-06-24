@@ -5,7 +5,7 @@ Portion servant à gerer les arguments/parametres du programme
 '''
 parser = argparse.ArgumentParser(description='getting full list of codes')
 parser.add_argument('data', nargs='*', metavar='data', type=str, help="The database(s) to be used.")
-parser.add_argument('-b','--biodata', nargs='*', metavar='data', type=str, help="biogrid list codes", required=True)
+parser.add_argument('-b', '--biodata', nargs='*', metavar='data', type=str, help="biogrid list codes", required=True)
 args = parser.parse_args()
 
 
@@ -63,7 +63,14 @@ def parsing_intact(file):
                     parsedfile.append(dataline)
     return parsedfile
 
+
 def getnames(data):
+    """
+    Fonction permettant de recuperer tous les codes proteiques present dans la base de donnee apres traitement sous
+    forme d'une liste tout en evitant la presence de doublon
+    :param data: base de donnee apres traitement par parsing_intact()
+    :return: liste de codes proteiques
+    """
     print("working on IntAct codes...")
     nameslist = []
     for i in range(len(data)):
@@ -73,7 +80,15 @@ def getnames(data):
             nameslist.append(data[i][1])
     return nameslist
 
+
 def namefile(data, mainfile):
+    """
+    Fonction permettant de creer un fichier txt contenant tous les codes IntAct et Biogrid en liant les codes recuperer
+    à l'aide du programme parsebio.py a ceux recuperer par getnames()
+    :param data: liste de codes proteiques
+    :param mainfile: fichier contenant les codes proteiques BioGrid
+    :return: un fichier txt avec tous les codes proteiques present dans Biogrid et IntAct
+    """
     print("working on BioGrid and Intact codes...")
     biolist = []
     with open(mainfile, 'r') as filin:
@@ -90,12 +105,17 @@ def namefile(data, mainfile):
             i = str(i)
             fileout.write(f"{i},")
 
+
 def fulllaunch():
+    """
+    Programme permettant d'obtenir le fichier txt en utilisant toutes les fonctions pour BioGrid et IntAct
+    :return: un fichier txt
+    """
     print("program launched")
     intactdata = parsing_intact(args.data[0])
     codelist = getnames(intactdata)
     namefile(codelist, args.biodata[0])
     print("processing finished")
 
-fulllaunch()
 
+fulllaunch()

@@ -1,5 +1,8 @@
 import argparse
 
+'''
+Portion servant à gerer les arguments/parametres du programme
+'''
 parser = argparse.ArgumentParser(description='Process a protein network to find the shortest path between two proteins')
 parser.add_argument('network', nargs=2, metavar='network', type=str,
                     help="The network to be used(first nodes then edges).")
@@ -11,6 +14,12 @@ args = parser.parse_args()
 
 
 def parse_nodes(nodes):
+    """
+    Fonction permettant de récuperer tous les nodes depuis le fichier JSON des nodes en clé de dictionnaire et de leurs
+    affecter False en valeurs
+    :param nodes: fichier JSON des nodes
+    :return: un dictionnaire avec tous les nodes
+    """
     print("parsing nodes...")
     parsed_nodes = {}
     with open(nodes, 'r') as filin:
@@ -21,6 +30,13 @@ def parse_nodes(nodes):
 
 
 def parse_edges(edges):
+    """
+    Fonction permettant de recuperer les couples de proteines en interactions sous forme de liste de liste et de garder
+    chaque ligne du fichier dans une liste
+    Cela est fait en splitant la ligne selon des marqueurs specifique au fichier
+    :param edges: fichier JSON des edges
+    :return: une liste de liste d'interaction, une liste des lignes du fichier JSON
+    """
     print("parsing edges...")
     parsed_edges = []
     edges_depository = []
@@ -37,6 +53,11 @@ def parse_edges(edges):
 
 
 def uni_listing(argument):
+    """
+    Fonction renvoyant les codes uniprot pris en argument sous forme de liste
+    :param argument: code uniprot
+    :return: liste de code uniprot
+    """
     print("code listing...")
     unicodes = []
     for i in argument:
@@ -46,6 +67,13 @@ def uni_listing(argument):
 
 
 def check_nodes(nodes, codes):
+    """
+    Fonction permettant de verifier que les codes proteique donnees en argument sont bien present dans les noeuds
+    (nodes)
+    :param nodes: dictionnaire ayant pour cles tous les noeuds obtenu a l'aide de parse_nodes()
+    :param codes: liste de code obtenu a l'aide de uni_listing()
+    :return: un booleen
+    """
     print("checking nodes...")
     for i in codes:
         if i not in nodes.keys():
@@ -54,6 +82,20 @@ def check_nodes(nodes, codes):
 
 
 def shortest_path(inter, main, target, track, marked):
+    """
+    Fonction permettant d'effectuer un parcours du plus court chemin sur la liste d'interactions proteique tout en
+    modifiant un dictionnaire donner en argument ou l'on gardera le predecesseur de chaque proteine jusqu'a trouver la
+    proteine cible.
+    Ce dictionnaire conserve les informations du plus court chemin
+    Afin d'eviter de repasser par la meme proteine a plusieurs reprise on utilisera le dictionnaire des noeuds set à
+    False ou l'on affectera True a chaque fois que l'on aura parcouru un noeud
+    :param inter: liste d'interactions
+    :param main: proteine source
+    :param target: proteine cible
+    :param track: dictionnaire de predecesseur
+    :param marked: dictionnaire de toutes les proteine set a False
+    :return: un booleen et la distance parcouru si plus court chemin trouver
+    """
     print("BFS ongoing...")
     queue = [main]
     marked[main] = True
@@ -83,6 +125,15 @@ def shortest_path(inter, main, target, track, marked):
 
 
 def pathfinding(path, main, target, limit):
+    """
+    Fonction permettant de retrouver tous les plus court en parcourant le dictionnaire de predecesseur par recurrence et
+    en conservant cela dans une liste de liste de plus court chemin
+    :param path: le dictionnaire des predecesseurs
+    :param main: proteine source
+    :param target: proteine cible
+    :param limit: distance du plus court chemin
+    :return: liste de liste des plus court chemin
+    """
     mpath = []
     if main == target:
         return [[main]]
@@ -96,6 +147,15 @@ def pathfinding(path, main, target, limit):
 
 
 def find_path(inter, main, target, marked):
+    """
+    Fonction permettant de lancer toutes les fonctions servant pour trouver le plus court chemin et gere aussi le cas ou
+    aucun plus court chemin n'est trouve
+    :param inter: liste d'interactions proteiques
+    :param main: proteine source
+    :param target: proteine cible
+    :param marked: dictionnaire de toutes les proteine set a False
+    :return: liste de liste des plus court chemin
+    """
     print("launch of shortest path...")
     tracker = {}
     link = []
@@ -110,6 +170,13 @@ def find_path(inter, main, target, marked):
 
 
 def neighbor_finder(path, edges):
+    """
+    Fonction permettant de trouver tous les voisins (interactions) des proteines presente dans le plus court chemin
+    :param path: liste des proteines du plus court chemin
+    :param edges: liste d'interactions proteiques
+    :return: un dictionnaire ayant pour cle les proteine de path et comme valeurs leurs voisins et une liste contenant
+    toutes ces proteines
+    """
     print("looking for neighbors...")
     neighbors = {}
     mem = []
@@ -130,6 +197,12 @@ def neighbor_finder(path, edges):
 
 
 def node_json_making(path, output="sp_nodes.txt"):
+    """
+    Fonction permettant de creer le fichier JSON correspondant aux nodes
+    :param path: liste de proteine
+    :param output: nom du fichier
+    :return: creer un fichier JSON
+    """
     print("making nodes file...")
     with open(output, 'w') as filout:
         for i in path:
@@ -138,6 +211,16 @@ def node_json_making(path, output="sp_nodes.txt"):
 
 
 def edge_json_making(path, edges, neighbors=None, output="sp_edges.txt"):
+    """
+    Fonction permettant de creer le(s) fichier JSON correspondant aux edges du/des plus courts chemin en parcourant
+    la/les liste(s) du/des plus court(s) chemin(s) deux a deux et en retrouvant ces couples directement dans la liste
+    des lignes du fichier JSON d'edge donner en argument
+    :param path: liste de(s) plus court(s) chemin(s)
+    :param edges: liste des lignes du fichier JSON en argument
+    :param neighbors: dictionnaire avec les voisins des proteines du plus court chemin si option active
+    :param output: nom du fichier
+    :return: fichier JSON des edges
+    """
     print("making edges file...")
     to_be_wrote = []
     print(" handling shortest path...")
@@ -164,6 +247,11 @@ def edge_json_making(path, edges, neighbors=None, output="sp_edges.txt"):
 
 
 def shortpath_main():
+    """
+    Programme faisant tourner toutes ces fonctions selon les options afin d'obtenir les fichiers JSON du/des plus
+    court(s) chemin(s)
+    :return: des fichiers JSON ou rien si absence de plus court chemin (un message le signifiant)
+    """
     print("program launched")
     nodes = parse_nodes(args.network[0])
     unicodes = uni_listing(args.codes)
